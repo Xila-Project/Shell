@@ -45,7 +45,7 @@ void Shell_Class::Set_Interface()
     Keyboard.Remove_Text_Area();
 
     // - Overlay
-    Overlay.Create(Graphics.Get_Top_Layer());
+    Overlay.Create(Screen);
     Overlay.Move_Foreground();
     Overlay.Set_Style_Background_Opacity(Opacity_Type::Transparent, 0);
     Overlay.Set_Size(18 * 8, 32);
@@ -76,6 +76,7 @@ void Shell_Class::Set_Interface()
     Clock_Label.Set_Style_Text_Color(Color_Type::White, 0);
 
     Desk.Set_Interface();
+    Drawer.Set_Interface();
 }
 
 /// @brief Shell main task.
@@ -85,10 +86,7 @@ void Shell_Class::Main_Task_Function()
 
     // - Registry
     if (this->Load_Registry() != Result_Type::Success)
-
-    {
         this->Create_Registry();
-    }
 
     Set_Interface();
 
@@ -97,14 +95,13 @@ void Shell_Class::Main_Task_Function()
         // Log_Verbose("Shell", "Main task");
         if (this->Instruction_Available())
         {
-            // Log_Verbose("Shell", "Instruction received");
             this->Execute_Instruction(Get_Instruction());
         }
         else
         {
             if (this->Get_Owner_User()->Get_State() != Accounts_Types::User_State_Type::Logged)
             {
-                Main_Task.Delay(100);
+                Main_Task.Delay(200);
             }
 
             // - Refresh the overlay every 10 seconds
@@ -176,7 +173,7 @@ Result_Type Shell_Class::Load_Registry()
     Static_String_Type<64> Shell_Registry_Path;
     this->Get_Owner_User()->Get_Home_Folder_Path(Shell_Registry_Path);
     Shell_Registry_Path += "/Shell/Shell.xrf";
-    Drive_Types::File_Type Registry_File = Drive.Open(Shell_Registry_Path, true);
+    Drive_Types::File_Type Registry_File = Drive.Open(Shell_Registry_Path);
 
     // - Load registry
     StaticJsonDocument<256> Shell_Registry;
@@ -204,7 +201,14 @@ Result_Type Shell_Class::Create_Registry()
     // - Open registry file
     Static_String_Type<64> Shell_Registry_Path;
     this->Get_Owner_User()->Get_Home_Folder_Path(Shell_Registry_Path);
-    Shell_Registry_Path += "/Registry/Shell.xrf";
+
+    Shell_Registry_Path += "/Registry/";
+
+    if (Drive.Make_Directory(Shell_Registry_Path) != Result_Type::Success)
+        return Result_Type::Error;
+
+    Shell_Registry_Path += "Shell.xrf";
+
     Drive_Types::File_Type Registry_File = Drive.Open(Shell_Registry_Path, true);
 
     // - Write registry
@@ -253,16 +257,21 @@ Result_Type Shell_Class::Save_Registry()
 /// @brief Refresh the header overlay.
 void Shell_Class::Refresh_Overlay()
 {
-    static char Clock_Text[6] = "00:00";
+    Log_Verbose("Shell", "Refreshing overlay");
+
+    char Clock_Text[6] = "00:00";
 
     using namespace Xila::Graphics_Types;
 
     // - Refresh clock
-    static Time_Type Current_Time = System.Get_Time();
+    Log_Trace();
+
+    Time_Type Current_Time = System.Get_Time(50);      
+
+    Log_Trace();
 
     if (Current_Time.Get_Hours() < 10)
     {
-        Clock_Text[0] = '0';
         Clock_Text[1] = '0' + Current_Time.Get_Hours();
     }
     else
@@ -275,7 +284,6 @@ void Shell_Class::Refresh_Overlay()
 
     if (Current_Time.Get_Minutes() < 10)
     {
-        Clock_Text[3] = '0';
         Clock_Text[4] = '0' + Current_Time.Get_Minutes();
     }
     else
@@ -367,6 +375,7 @@ void Shell_Class::Refresh_Overlay()
             }
         }
     }
+    Overlay.Move_Foreground();
 }
 
 void Shell_Class::Get_Software_Icon(Graphics_Types::Object_Type &Icon_Container, const String_Type &Name)

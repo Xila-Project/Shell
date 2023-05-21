@@ -14,10 +14,8 @@ Shell_Class::Login_Class::Login_Class(Shell_Class *Shell_Pointer) : Shell_Pointe
 {
     using namespace Graphics_Types;
 
-    Log_Verbose("Shell", "Login_Class::Login_Class() : %p", Shell_Pointer);
-
     Dialog.Create(Shell_Pointer);
-    Log_Verbose("Shell", "Login : %p", Dialog.Get_Pointer());
+
     Dialog.Set_Title("Login");
     Dialog.Get_Body().Set_Flex_Flow(Flex_Flow_Type::Column);
     Dialog.Get_Body().Set_Flex_Alignment(Flex_Alignment_Type::Space_Evenly, Flex_Alignment_Type::Center, Flex_Alignment_Type::Center);
@@ -107,19 +105,6 @@ void Shell_Class::Login_Class::Execute_Instruction(const Instruction_Type &Instr
         if (Current_Target  == Login_Button)
         {
             Drive.Remove_Directory("/Users/Alix", true);
-
-            // - Print Users dir content
-            Log_Verbose("Shell", "Users dir content :");
-
-            Drive_Types::File_Type Users = Drive.Open("/Users");
-            Users.Rewind_Directory();
-
-            Drive_Types::File_Type Item = Users.Open_Next_File();
-            while (Item)
-            {
-                Log_Verbose("Login", "%s", Item.Get_Name());
-                Item = Users.Open_Next_File();
-            }
 
             Accounts.Create("Alix", "");
 

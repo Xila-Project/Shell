@@ -38,6 +38,14 @@ void Shell_Class::Desk_Class::Set_Interface()
 
     Desk_Grid.Create(Window.Get_Body());
 
+    Static_String_Type<24> User_Name;
+    Shell_Pointer->Get_Owner_User()->Get_Name(User_Name);
+    if (User_Name == "Xila")
+    {
+  //      Desk_Grid.Add_Flag(Flag_Type::Hidden);
+        Window.Set_Title("");
+    }   
+
     Desk_Grid.Set_Style_Pad_All(10, 0);
     Desk_Grid.Set_Style_Background_Opacity(Opacity_Type::Transparent, 0);
     Desk_Grid.Set_Flex_Flow(Flex_Flow_Type::Column_Wrap);
@@ -48,6 +56,9 @@ void Shell_Class::Desk_Class::Set_Interface()
 
     // - Dock
     Dock.Create(Window.Get_Body());
+    if (User_Name == "Xila")
+        Dock.Add_Flag(Flag_Type::Hidden);
+
     Dock.Set_Size(Percentage(60), 7 * 8);
 
     // - - Dock's style
@@ -82,8 +93,6 @@ void Shell_Class::Desk_Class::Set_Interface()
     Dock_Maximize_Button.Create(Dock_Options, "Maximize", 0, 0, Shell_Pointer);
     Dock_Maximize_Button.Set_Style_Background_Opacity(Opacity_Type::Cover, 0);
     Dock_Maximize_Button.Set_Style_Background_Color(Color_Type::Green[5], 0);
-
-
 
     // - Menu button
     static Style_Type Menu_Button_Style;
@@ -161,26 +170,15 @@ void Shell_Class::Desk_Class::Set_Interface()
     Dock_List.Set_Style_Pad_All(0, 0);
     Dock_List.Set_Content_Height(40);
 
+    // - If current user is the system user (Xila), open login screen or installer.
+    if (User_Name == "Xila")
     {
-        Static_String_Type<24> User_Name;
+        Drive_Types::File_Type Users_Folder = Drive.Open(Users_Directory_Path);
 
-        Shell_Pointer->Get_Owner_User()->Get_Name(User_Name);
-
-        // - If current user is the system user (Xila), open login screen or installer.
-        if (User_Name == "Xila")
-        {
-            Drive_Types::File_Type Users_Folder = Drive.Open(Users_Directory_Path);
-
-            if (Users_Folder && Users_Folder.Is_Directory() && (Users_Folder.Get_Items_Count() > 0))
-                Shell_Class::Login_Class::Open(Shell_Pointer);
-
-            else
-                Shell_Class::Installer_Class::Open(Shell_Pointer);
-
-            // Hide dock since current user is system user (Xila).
-            Dock.Add_Flag(Flag_Type::Hidden);
-            Window.Set_Title("");
-        }
+        if (Users_Folder && Users_Folder.Is_Directory() && (Users_Folder.Get_Items_Count() > 0))
+            Shell_Class::Login_Class::Open(Shell_Pointer);
+        else
+            Shell_Class::Installer_Class::Open(Shell_Pointer);
     }
 
     Refresh();
@@ -228,6 +226,9 @@ void Shell_Class::Desk_Class::Set_Software_Window_State(const Softwares_Types::S
 
 void Shell_Class::Desk_Class::Refresh()
 {
+    // - If the dock is hidden, do nothing.
+    if (Dock.Has_Flag(Graphics_Types::Flag_Type::Hidden))
+        return;
 
     // - Desk icons
     //    {
@@ -262,27 +263,16 @@ void Shell_Class::Desk_Class::Refresh()
 
     // Delete grid items except the dock.
 
-    // - If the dock is hidden, do nothing.
-    Log_Trace();
-
-    if (Dock.Has_Flag(Graphics_Types::Flag_Type::Hidden))
-    {
-        return;
-    }
     // - Refresh dock software list.
-
-    Log_Trace();
 
     // If there are too many buttons, delete some.
 
     const uint8_t User_Softwares_Count = Softwares.Get_User_Softwares_Count(Shell_Pointer->Get_Owner_User());
 
-    Log_Verbose("Shell", "User softwares count : %u", User_Softwares_Count);
-
     while (Dock_List.Get_Children_Count() > (User_Softwares_Count - 1))
     {
-        Log_Verbose("Shell", "Deleting dock icon %u", Dock_List.Get_Children_Count() - 1);
         Dock_List.Get_Child(Dock_List.Get_Children_Count() - 1).Delete();
+        Shell_Pointer->Main_Task.Delay(5); // Since the deletion is asynchronous, wait a little bit.
     }
 
     // If there is not enough icons, create more.
@@ -291,8 +281,6 @@ void Shell_Class::Desk_Class::Refresh()
         Graphics_Types::Label_Type Icon_Label;
         while (Dock_List.Get_Children_Count() < (User_Softwares_Count - 1))
         {
-
-            Log_Verbose("Shell", "Creating dock icon %u", Dock_List.Get_Children_Count());
             Icon_Container.Create(Dock_List);
             Icon_Label.Create(Icon_Container);
             Icon_Container.Set_Alignment(Graphics_Types::Alignment_Type::Top_Middle);
@@ -303,9 +291,6 @@ void Shell_Class::Desk_Class::Refresh()
             Icon_Label.Clear_Pointer();
         }
     }
-
-
-    Log_Trace();
 
     // - - Set dock software icons.
     {
@@ -343,8 +328,9 @@ void Shell_Class::Desk_Class::Execute_Instruction(const Instruction_Type &Instru
         case Event_Code_Type::Child_Changed:
             if (Current_Target == Shell_Pointer->Screen)
             {
-                Refresh();
+                Log_Verbose("fd", "Child created");
                 Shell_Pointer->Refresh_Overlay();
+                Refresh();
             }
             break;
         case Event_Code_Type::Pressed:
@@ -400,8 +386,6 @@ void Shell_Class::Desk_Class::Execute_Instruction(const Instruction_Type &Instru
                 Shell_Class::Power_Class::Open(*Shell_Pointer);
             }
             Ignore_Button.Clear_Pointer();
-            break;
-        default:
             break;
         }
     }

@@ -19,9 +19,12 @@ void Shell_Class::Drawer_Class::Set_Interface()
     using namespace Graphics_Types;
 
     Window.Create(Shell_Pointer);
-    Window.Set_Minimize_Button_Hidden(true);
 
+    Close();
+    Window.Set_Minimize_Button_Hidden(true);
     Window.Set_Title("Drawer");
+    Window.Get_Close_Button().Remove_All_Events();
+    Window.Get_Close_Button().Add_Event(Shell_Pointer, Graphics_Types::Event_Code_Type::Clicked);
 
     // - Set flex container
     Window.Get_Body().Set_Flex_Flow(Flex_Flow_Type::Column_Wrap);
@@ -74,7 +77,7 @@ void Shell_Class::Drawer_Class::Set_Interface()
 
 Shell_Class::Drawer_Class::~Drawer_Class()
 {
-    Close();
+    Window.Delete();
 }
 
 void Shell_Class::Drawer_Class::Execute_Instruction(const Instruction_Type &Instruction)
@@ -82,27 +85,34 @@ void Shell_Class::Drawer_Class::Execute_Instruction(const Instruction_Type &Inst
     if (Instruction.Get_Sender() == &Graphics)
     {
         using namespace Graphics_Types;
+        Object_Type Current_Target = Instruction.Graphics.Get_Current_Target(); // Get icon container
         switch (Instruction.Graphics.Get_Code())
         {
         case Graphics_Types::Event_Code_Type::Clicked:
         {
-            Object_Type Current_Target = Instruction.Graphics.Get_Current_Target(); // Get icon container
-            Size_Type Child_Index = Window.Get_Body().Get_Child_Index(Current_Target);              // Get icon container index
-            uint8_t Handle_Count = Softwares.Get_Handle_Count();
-            for (uint8_t j = 0; j < Softwares.Get_Handle_Count(); j++)
+            if (Current_Target == Window.Get_Close_Button())
             {
-                if (Shell_Pointer->Get_Handle() == Softwares.Get_Handle(j))
+                Close();
+            }
+            else if (Current_Target.Get_Parent() == Window.Get_Body())
+            {
+                Size_Type Child_Index = Window.Get_Body().Get_Child_Index(Current_Target); // Get icon container index
+                uint8_t Handle_Count = Softwares.Get_Handle_Count();
+                for (uint8_t j = 0; j < Softwares.Get_Handle_Count(); j++)
                 {
-                    j++;
-                    Child_Index++;
-                }
+                    if (Shell_Pointer->Get_Handle() == Softwares.Get_Handle(j))
+                    {
+                        j++;
+                        Child_Index++;
+                    }
 
-                if (Child_Index == j)
-                {
-                    Softwares.Get_Handle(j)->Create_Instance(Shell_Pointer->Get_Owner_User());
-                    Shell_Pointer->Desk.Refresh();
-                    Close();
-                    break;
+                    if (Child_Index == j)
+                    {
+                        Softwares.Get_Handle(j)->Create_Instance(Shell_Pointer->Get_Owner_User());
+                        Shell_Pointer->Desk.Refresh();
+                        Close();
+                        break;
+                    }
                 }
             }
         }
@@ -117,22 +127,18 @@ void Shell_Class::Drawer_Class::Open()
 {
     using namespace Graphics_Types;
 
-    if (!Is_Openned())
-        Set_Interface();
-    else
-        Window.Set_State(Window_State_Type::Maximized);
+    Window.Set_State(Window_State_Type::Maximized);
 }
 
 void Shell_Class::Drawer_Class::Close()
 {
-    if (Is_Openned())
-        Window.Delete();
+    Window.Set_State(Graphics_Types::Window_State_Type::Minimized);
 }
 
 bool Shell_Class::Drawer_Class::Is_Openned()
 {
     using namespace Graphics_Types;
-    
+
     if (!Window)
         return false;
 
