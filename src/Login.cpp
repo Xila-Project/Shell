@@ -104,10 +104,6 @@ void Shell_Class::Login_Class::Execute_Instruction(const Instruction_Type &Instr
     case Event_Code_Type::Clicked:
         if (Current_Target  == Login_Button)
         {
-            Drive.Remove_Directory("/Users/Alix", true);
-
-            Accounts.Create("Alix", "");
-
             Name_Input.Set_Text("Alix");
             Password_Input.Set_Text("");
 

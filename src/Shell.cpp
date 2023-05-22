@@ -257,7 +257,7 @@ Result_Type Shell_Class::Save_Registry()
 /// @brief Refresh the header overlay.
 void Shell_Class::Refresh_Overlay()
 {
-    Log_Verbose("Shell", "Refreshing overlay");
+  //  Log_Verbose("Shell", "Refreshing overlay");
 
     char Clock_Text[6] = "00:00";
 

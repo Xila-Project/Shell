@@ -328,7 +328,7 @@ void Shell_Class::Desk_Class::Execute_Instruction(const Instruction_Type &Instru
         case Event_Code_Type::Child_Changed:
             if (Current_Target == Shell_Pointer->Screen)
             {
-                Log_Verbose("fd", "Child created");
+              //  Log_Verbose("fd", "Child created");
                 Shell_Pointer->Refresh_Overlay();
                 Refresh();
             }
