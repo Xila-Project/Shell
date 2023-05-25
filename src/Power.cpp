@@ -20,16 +20,16 @@ Shell_Class::Power_Class::Power_Class(Shell_Class &Shell) : Shell(Shell)
 
     Dialog.Add_Event(&Shell, Event_Code_Type::Delete);
 
-    Shutdown_Button.Create(Dialog.Get_Body(), LV_SYMBOL_POWER "Shutdown");
+    Shutdown_Button.Create(Dialog.Get_Body(), LV_SYMBOL_POWER " Shutdown");
     Shutdown_Button.Add_Event(&Shell, Graphics_Types::Event_Code_Type::Clicked);
     
-    Restart_Button.Create(Dialog.Get_Body(), LV_SYMBOL_REFRESH "Reboot");
+    Restart_Button.Create(Dialog.Get_Body(), LV_SYMBOL_REFRESH " Reboot");
     Restart_Button.Add_Event(&Shell, Graphics_Types::Event_Code_Type::Clicked);
 
     Static_String_Type<24> User_Name;
     if (Shell.Get_Owner_User()->Get_Name(User_Name) != "Xila")
     {
-        Logout_Button.Create(Dialog.Get_Body(), LV_SYMBOL_NEW_LINE "Logout");
+        Logout_Button.Create(Dialog.Get_Body(), LV_SYMBOL_NEW_LINE " Logout");
         Logout_Button.Add_Event(&Shell, Graphics_Types::Event_Code_Type::Clicked);
     }
 }

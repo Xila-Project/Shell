@@ -92,7 +92,6 @@ void Shell_Class::Main_Task_Function()
 
     while (1)
     {
-        // Log_Verbose("Shell", "Main task");
         if (this->Instruction_Available())
         {
             this->Execute_Instruction(Get_Instruction());
@@ -127,6 +126,13 @@ void Shell_Class::Execute_Instruction(Instruction_Type Instruction)
             break;
         }
         return;
+    }
+    else if (Instruction.Get_Sender() == &Power)
+    {
+        if (Instruction.Power.Get_Code() == Power_Types::Event_Code_Type::Power_Button_Pressed)
+        {
+            Shell_Class::Power_Class::Open(*this);
+        }
     }
     else if (Instruction.Get_Sender() == &Graphics)
     {
@@ -257,7 +263,7 @@ Result_Type Shell_Class::Save_Registry()
 /// @brief Refresh the header overlay.
 void Shell_Class::Refresh_Overlay()
 {
-  //  Log_Verbose("Shell", "Refreshing overlay");
+    //  Log_Verbose("Shell", "Refreshing overlay");
 
     char Clock_Text[6] = "00:00";
 
@@ -266,7 +272,7 @@ void Shell_Class::Refresh_Overlay()
     // - Refresh clock
     Log_Trace();
 
-    Time_Type Current_Time = System.Get_Time(50);      
+    Time_Type Current_Time = System.Get_Time(50);
 
     Log_Trace();
 
@@ -328,32 +334,30 @@ void Shell_Class::Refresh_Overlay()
 
     {
         Label_Type Battery_Label = Label_Type(Battery_Button.Get_Child(0)); // Casting
-        // - Update charge level
-        if (!Battery_Label.Is_Valid())
+        // - Update charge level        
+        Log_Verbose("Shell", "Battery level : %d", Power.Get_Battery_Charge_Level());
+        Log_Verbose("Shell", "Battery voltage : %d", Power.Get_Battery_Voltage());
+        if (Power.Get_Battery_Charge_Level() >= 85)
         {
-        }
-        Battery_Label.Set_Text(LV_SYMBOL_BATTERY_2);
-        /*
-        else if (Power.Get_Charge_Level() >= 85)
-        {
+            
             Battery_Label.Set_Text(LV_SYMBOL_BATTERY_FULL);
         }
-        else if (Power.Get_Charge_Level() >= 60)
+        else if (Power.Get_Battery_Charge_Level() >= 60)
         {
             Battery_Label.Set_Text(LV_SYMBOL_BATTERY_3);
         }
-        else if (Power.Get_Charge_Level() >= 35)
+        else if (Power.Get_Battery_Charge_Level() >= 35)
         {
             Battery_Label.Set_Text(LV_SYMBOL_BATTERY_2);
         }
-        else if (Power.Get_Charge_Level() >= 10)
+        else if (Power.Get_Battery_Charge_Level() >= 10)
         {
             Battery_Label.Set_Text(LV_SYMBOL_BATTERY_1);
         }
         else
         {
             Battery_Label.Set_Text(LV_SYMBOL_BATTERY_EMPTY);
-        }*/
+        }
     }
     {
         Label_Type Sound_Label = Label_Type(Sound_Button.Get_Child(0)); // Casting
