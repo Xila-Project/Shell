@@ -334,9 +334,7 @@ void Shell_Class::Refresh_Overlay()
 
     {
         Label_Type Battery_Label = Label_Type(Battery_Button.Get_Child(0)); // Casting
-        // - Update charge level        
-        Log_Verbose("Shell", "Battery level : %d", Power.Get_Battery_Charge_Level());
-        Log_Verbose("Shell", "Battery voltage : %d", Power.Get_Battery_Voltage());
+        // - Update charge level
         if (Power.Get_Battery_Charge_Level() >= 85)
         {
             
@@ -365,11 +363,11 @@ void Shell_Class::Refresh_Overlay()
         {
             // -- Update sound
             // Log_Verbose("Shell", "Sound volume : %d", Sound.Get_Volume());
-            if (Sound.Get_Volume() >= (255 * 2 / 3))
+            if (Sound.Get_Volume() >= 0.66)
             {
                 Sound_Label.Set_Text(LV_SYMBOL_VOLUME_MAX);
             }
-            else if (Sound.Get_Volume() >= (255 / 3))
+            else if (Sound.Get_Volume() >= 0.33)
             {
                 Sound_Label.Set_Text(LV_SYMBOL_VOLUME_MID);
             }
