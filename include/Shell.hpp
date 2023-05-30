@@ -31,6 +31,8 @@ using namespace Xila;
 class Shell_Class : public Softwares_Types::Software_Type
 {
 public:
+
+    /// @brief Shell handle instance.
     static class Shell_Handle_Class : public Softwares_Types::Software_Handle_Type
     {
     public:
