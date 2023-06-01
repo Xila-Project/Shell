@@ -263,23 +263,16 @@ Result_Type Shell_Class::Save_Registry()
 /// @brief Refresh the header overlay.
 void Shell_Class::Refresh_Overlay()
 {
-    //  Log_Verbose("Shell", "Refreshing overlay");
-
     char Clock_Text[6] = "00:00";
 
     using namespace Xila::Graphics_Types;
 
     // - Refresh clock
-    Log_Trace();
 
     Time_Type Current_Time = System.Get_Time(50);
 
-    Log_Trace();
-
     if (Current_Time.Get_Hours() < 10)
-    {
         Clock_Text[1] = '0' + Current_Time.Get_Hours();
-    }
     else
     {
         Clock_Text[0] = '0' + Current_Time.Get_Hours() / 10;
@@ -289,9 +282,7 @@ void Shell_Class::Refresh_Overlay()
     Clock_Text[2] = ':';
 
     if (Current_Time.Get_Minutes() < 10)
-    {
         Clock_Text[4] = '0' + Current_Time.Get_Minutes();
-    }
     else
     {
         Clock_Text[3] = '0' + Current_Time.Get_Minutes() / 10;
@@ -362,7 +353,6 @@ void Shell_Class::Refresh_Overlay()
         if (Sound_Label.Is_Valid())
         {
             // -- Update sound
-            // Log_Verbose("Shell", "Sound volume : %d", Sound.Get_Volume());
             if (Sound.Get_Volume() >= 0.66)
             {
                 Sound_Label.Set_Text(LV_SYMBOL_VOLUME_MAX);
@@ -385,19 +375,13 @@ void Shell_Class::Get_Software_Icon(Graphics_Types::Object_Type &Icon_Container,
     using namespace Xila::Graphics_Types;
 
     if (!Icon_Container.Is_Valid())
-    {
-        Log_Verbose("Shell", "Invalid icon label.");
         return;
-    }
 
     Label_Type Icon_Label = Label_Type(Icon_Container.Get_Child(0));
 
     if (!Icon_Label.Is_Valid())
-    {
-        Log_Verbose("Shell", "Invalid icon label.");
         return;
-    }
-
+    
     Icon_Container.Set_Size(5 * 8, 5 * 8);
     Icon_Container.Set_Style_Radius(5, 0);
     Icon_Container.Set_Style_Pad_All(0, 0);

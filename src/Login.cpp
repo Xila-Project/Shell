@@ -88,29 +88,21 @@ void Shell_Class::Login_Class::Execute_Instruction(const Instruction_Type &Instr
     case Event_Code_Type::Focused:
         if (Current_Target == Name_Input)
         {
-            Log_Verbose("Shell", "Focused on name input");
             Shell_Pointer->Keyboard.Set_Text_Area(Name_Input);
         }
         else if (Current_Target == Password_Input)
         {
-            Log_Verbose("Shell", "Focused on password input");
             Shell_Pointer->Keyboard.Set_Text_Area(Password_Input);
         }
         break;
     case Event_Code_Type::Defocused:
-        Log_Verbose("Shell", "Defocused on name or password input");
         Shell_Pointer->Keyboard.Remove_Text_Area();
         break;
     case Event_Code_Type::Clicked:
         if (Current_Target  == Login_Button)
         {
-            Name_Input.Set_Text("Alix");
-            Password_Input.Set_Text("");
-
             if (Accounts.Login(Name_Input.Get_Text(), Password_Input.Get_Text()) == Result_Type::Success)
-            {
                 Softwares.Open(Shell_Pointer->Get_Handle(), Accounts.Get_User(Accounts.Find_User(Name_Input.Get_Text())));
-            }
             else
             {
                 Name_Input.Set_Style_Border_Color(Graphics_Types::Color_Type::Red[5], 0);

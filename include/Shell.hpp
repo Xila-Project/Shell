@@ -36,7 +36,7 @@ public:
     static class Shell_Handle_Class : public Softwares_Types::Software_Handle_Type
     {
     public:
-        Shell_Handle_Class() : Softwares_Types::Software_Handle_Type("Shell") { Log_Verbose("Shell", "Handle created"); };
+        Shell_Handle_Class() : Softwares_Types::Software_Handle_Type("Shell") {  };
 
         void Create_Instance(const Accounts_Types::User_Type *Owner_User) const override
         {

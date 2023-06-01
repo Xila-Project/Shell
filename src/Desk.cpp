@@ -202,9 +202,8 @@ const Softwares_Types::Software_Type *Shell_Class::Desk_Class::Get_Software_Poin
 
         if (j == Index)
         {
-            Log_Verbose("Shell", "Software %u found !", j);
             return Softwares.Get_User_Softwares(Shell_Pointer->Get_Owner_User(), j);
-        };
+        }
     }
     return NULL;
 }
@@ -328,7 +327,6 @@ void Shell_Class::Desk_Class::Execute_Instruction(const Instruction_Type &Instru
         case Event_Code_Type::Child_Changed:
             if (Current_Target == Shell_Pointer->Screen)
             {
-              //  Log_Verbose("fd", "Child created");
                 Shell_Pointer->Refresh_Overlay();
                 Refresh();
             }
