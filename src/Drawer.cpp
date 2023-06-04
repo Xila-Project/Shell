@@ -61,7 +61,7 @@ void Shell_Class::Drawer_Class::Set_Interface()
             Shell_Pointer->Get_Software_Icon(Icon_Container, Name);
 
             // - Set software label
-            Label.Create(Container, Name, Percentage(100));
+            Label.Create(Container, Name, false, Percentage(100));
             //   Label.Set_Alignment(Alignment_Type::Bottom_Middle);
             Label.Set_Long_Mode(Graphics_Types::Long_Type::Dot);
             Label.Add_Flag(Flag_Type::Event_Bubble);
