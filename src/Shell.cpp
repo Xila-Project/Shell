@@ -293,18 +293,28 @@ void Shell_Class::Refresh_Overlay()
 
     {
         Label_Type WiFi_Label = Label_Type(WiFi_Button.Get_Child(0)); // Casting
-        if (Communication.WiFi.Get_Mode() == Communication_Types::Mode_Type::Station && Communication.WiFi.Station.Get_Status() == Communication_Types::Status_Type::Connected)
+
+        Network_Types::Interface_Type *Network_Interface_Pointer = NULL;
+
+        if (Network.Get_Connected_Interface_Count() > 0)
+            Network_Interface_Pointer = Network.Get_Connected_Interface();
+
+        if (!Network_Interface_Pointer)
+            Network_Interface_Pointer = Network.Get_Interface();
+
+        if (Network_Interface_Pointer->Get_Type() == Network_Types::Interface_Type_Type::WiFi && Network_Interface_Pointer->Get_State() == Network_Types::State_Type::Connected)
         {
+            auto WiFi_Interface_Pointer = (Network_Types::WiFi_Interface_Type*)Network_Interface_Pointer;
             // - Update WiFi signal strength
             // TODO : Add different WiFi signal strength icons.
             if (!WiFi_Label.Is_Valid())
             {
             }
-            else if (Communication.WiFi.Station.Get_RSSI() >= (-120 / 3))
+            else if (WiFi_Interface_Pointer->Station.Get_RSSI() >= (-120 / 3))
             {
                 WiFi_Label.Set_Text(LV_SYMBOL_WIFI);
             }
-            else if (Communication.WiFi.Station.Get_RSSI() >= (-120 * 2 / 3))
+            else if (WiFi_Interface_Pointer->Station.Get_RSSI() >= (-120 * 2 / 3))
             {
                 WiFi_Label.Set_Text(LV_SYMBOL_WIFI);
             }
@@ -312,10 +322,6 @@ void Shell_Class::Refresh_Overlay()
             {
                 WiFi_Label.Set_Text(LV_SYMBOL_WIFI);
             }
-        }
-        else if (Communication.WiFi.Get_Mode() == Communication_Types::Mode_Type::Access_Point)
-        {
-            WiFi_Label.Set_Text("");
         }
         else
         {
@@ -328,7 +334,7 @@ void Shell_Class::Refresh_Overlay()
         // - Update charge level
         if (Power.Get_Battery_Charge_Level() >= 85)
         {
-            
+
             Battery_Label.Set_Text(LV_SYMBOL_BATTERY_FULL);
         }
         else if (Power.Get_Battery_Charge_Level() >= 60)
@@ -381,7 +387,7 @@ void Shell_Class::Get_Software_Icon(Graphics_Types::Object_Type &Icon_Container,
 
     if (!Icon_Label.Is_Valid())
         return;
-    
+
     Icon_Container.Set_Size(5 * 8, 5 * 8);
     Icon_Container.Set_Style_Radius(5, 0);
     Icon_Container.Set_Style_Pad_All(0, 0);
